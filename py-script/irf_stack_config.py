@@ -1,3 +1,6 @@
+## This is a Comware IRF stack configuration builder
+# written by Ray Glauner and modifed by Mike Skelly
+
 # This is Ten gig interfaces using four ports on each module.
 # Change the information in the IRF class to change the port names/numbers.
 class default:
