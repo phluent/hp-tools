@@ -34,22 +34,29 @@ for x in range(0,len(PortList2)):
     tmp2.append(PortTypeName+PortList2[x])
 PortInt.append(tmp2)
 
-print '****************************'
-print 'Unplug all cables used for IRF on these systems'
-print '****************************'
-print 'On Switch 2 do the following'
-print '****************************'
+def note(message):
+    print '# '+message
+
+def separator():
+    print '############################'
+
+
+separator
+note('Unplug all cables used for IRF on these systems')
+separator
+note('On Switch 2 do the following')
+separator
 print 'system'
 print 'irf member 1 renumber 2'
-print '---> you must answer YES before proceding'
+note('---> you must answer YES before proceding')
 print 'save'
 print 'quit'
 print 'reboot'
-print '****************************'
-print 'end of switch 2 config for now'
-print '****************************'
-print 'On Switch 1 do the following'
-print '****************************'
+separator
+note('end of switch 2 config for now')
+separator
+note('On Switch 1 do the following')
+separator
 print 'system'
 for x in range(0,len(PortInt[0])):
     print 'interface ' + PortInt[0][x]
@@ -67,11 +74,11 @@ for x in range(0,len(PortInt[0])):
     print 'undo shutdown'
 print 'quit'
 print 'save'
-print '****************************'
-print 'Member 1 is done'
-print '****************************'
-print 'Finish member 2 configuration'
-print '****************************'
+separator
+note('Member 1 is done')
+separator
+note('Finish member 2 configuration')
+separator
 for x in range(0,len(PortInt[0])):
     print 'interface ' + PortInt[1][x]
     print 'shutdown'
@@ -87,9 +94,9 @@ for x in range(0,len(PortInt[0])):
     print 'undo shutdown'
     print 'quit'
     print 'save'
-print '****************************'
-print 'plug in all IRF cables both members'
-print 'member two should reboot when plugging in the cables'
-print '****************************'
-print ' 5900 do this on both switches -irf-port-configuration active.'
+separator
+note('plug in all IRF cables both members')
+note('member two should reboot when plugging in the cables')
+separator
+note('5900 do this on both switches -irf-port-configuration active.')
 raw_input('hit any key when done:')
