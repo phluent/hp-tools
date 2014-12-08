@@ -5,7 +5,7 @@
 # Change the information in the IRF class to change the port names/numbers.
 class default:
     IrfPreamble = 'irf mac-address persistent timer', 'irf auto-update enable' ,'undo irf link-delay'
-    IrfMemPri = '30','25'
+    IrfMemPri = '50','40','30','25','20','15','10','5'
     PortTypeName = 'Ten-GigabitEthernet'
 PortTypeName=''
 numIRFMembers = []
