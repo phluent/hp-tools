@@ -5,34 +5,35 @@
 # Change the information in the IRF class to change the port names/numbers.
 class default:
     IrfPreamble = 'irf mac-address persistent timer', 'irf auto-update enable' ,'undo irf link-delay'
-    IrfPort = 'irf-port 1/1','irf-port 2/2'
-    IrfMemPri = 'irf member 1 priority 30','irf member 2 priority 25'
+    IrfMemPri = '30','25'
     PortTypeName = 'Ten-GigabitEthernet'
-    PortInt = ['Ten-GigabitEthernet1/0/1','Ten-GigabitEthernet1/0/2','Ten-GigabitEthernet1/0/13','Ten-GigabitEthernet1/0/14'],['Ten-GigabitEthernet2/0/1','Ten-GigabitEthernet2/0/2','Ten-GigabitEthernet2/0/13','Ten-GigabitEthernet2/0/14']
 PortTypeName=''
-PortList1 = [] # Create a list of port numbers e.g. 1/0/22
-PortList2 = [] # Create a list of port numbers e.g. 2/0/13
-PortInt =[]
-tmp1 = []
-tmp2 =[]
-try:
-    numIRFPorts = input("Enter the number of Interfaces to configure on fisrt switch <1-8> [2]: ")
+numIRFMembers = []
+irfMembers = []
+
+try: 
+    numIRFMembers = input("Enter the number of IRF Members <2-8> [2]: ")
 except SyntaxError:
-    numIRFPorts = 2
+    numIRFMembers = 2
+
+numIRFPorts = 2 # Not sure that it makes sense to have more than two IRF ports, all somple configurations stop there
+#try:
+#    numIRFPorts = input("Enter the number of Interfaces to configure for irf <1-2> [2]: ")
+#except SyntaxError:
+#    numIRFPorts = 2
 
 PortTypeName = raw_input('Enter the Interface name <Ten-GigabitEthernet> [Ten-GigabitEthernet]: ')
 if PortTypeName =='':
     PortTypeName = default.PortTypeName
-for i in range(numIRFPorts):
-    PortList1.append(raw_input('interface port for IRF member 1 <1/0/4>: '))
-for i in range(numIRFPorts):
-    PortList2.append(raw_input('interface port for IRF member 2 <1/0/4>: '))
-for x in range(0,len(PortList1)):
-    tmp1.append(PortTypeName+PortList1[x])
-PortInt.append(tmp1)
-for x in range(0,len(PortList2)):
-    tmp2.append(PortTypeName+PortList2[x])
-PortInt.append(tmp2)
+
+for i in range(numIRFMembers):
+    memberPorts = []
+    for n in range(numIRFPorts):
+        tmpPort = raw_input('interface port for IRF member {member} port {port} <{member}/0/{port}>: '.format(member=i+1,port=n+1))
+        if tmpPort == '':
+            tmpPort = str(i+1) + '/0/' + str(n+1)
+        memberPorts.append(PortTypeName+tmpPort)
+    irfMembers.append(memberPorts)
 
 def note(message):
     print '# '+message
@@ -40,63 +41,58 @@ def note(message):
 def separator():
     print '############################'
 
-
-separator
+separator()
 note('Unplug all cables used for IRF on these systems')
-separator
-note('On Switch 2 do the following')
-separator
-print 'system'
-print 'irf member 1 renumber 2'
-note('---> you must answer YES before proceding')
-print 'save'
-print 'quit'
-print 'reboot'
-separator
-note('end of switch 2 config for now')
-separator
-note('On Switch 1 do the following')
-separator
-print 'system'
-for x in range(0,len(PortInt[0])):
-    print 'interface ' + PortInt[0][x]
-    print 'shutdown'
-print 'quit'
-for x in range(0,len(default.IrfPreamble)):
-    print default.IrfPreamble[x]
-print default.IrfMemPri[0]
-print 'irf-port 1/1'
-for x in range(0, len(PortInt[0])):
-    print 'port group interface ' + PortInt[0][x] + ' mode enhanced'
+separator()
 
-for x in range(0,len(PortInt[0])):
-    print 'interface ' + PortInt[0][x]
-    print 'undo shutdown'
-print 'quit'
-print 'save'
-separator
-note('Member 1 is done')
-separator
-note('Finish member 2 configuration')
-separator
-for x in range(0,len(PortInt[0])):
-    print 'interface ' + PortInt[1][x]
-    print 'shutdown'
-print 'quit'
-for x in range(0,len(default.IrfPreamble)):
-    print default.IrfPreamble[x]
-print default.IrfMemPri[1]
-print default.IrfPort[1]
-for x in range(0, len(PortInt[0])):
-    print 'port group interface ' + PortInt[1][x] + ' mode enhanced'
-for x in range(0,len(PortInt[0])):
-    print 'interface ' + PortInt[1][x]
-    print 'undo shutdown'
-    print 'quit'
+# begin IRF config by renumbering member devices (last to first)
+for i,e in reversed(list(enumerate(irfMembers))):
+    current_member_id = i+1
+    separator()
+    if current_member_id == 1: break
+    note('On switch %s run the following' % current_member_id)
+    separator()
+    print 'system'
+    print "irf member 1 renumber %s" % current_member_id
+    note('---> you must answer YES before proceding')
     print 'save'
-separator
-note('plug in all IRF cables both members')
-note('member two should reboot when plugging in the cables')
-separator
-note('5900 do this on both switches -irf-port-configuration active.')
+    print 'quit'
+    print 'reboot'
+    separator()
+    note('end of switch %s config for now' % current_member_id)
+
+
+# continue IRF configuration by setting ports (first to last)
+for i,ports in list(enumerate(irfMembers)):
+    current_member_id = i+1
+    separator()
+    note('On Switch %s do the following' % current_member_id)
+    separator()
+    print 'system'
+    for p in ports:
+        print 'interface ' + p
+        print 'shutdown'
+    print 'quit'
+    
+    for line in default.IrfPreamble:
+        print line
+
+    print 'irf member %s priority %s' % (current_member_id, default.IrfMemPri[i])
+
+    for n,interface in list(enumerate(ports)):
+        print 'irf-port %s/%s' % (current_member_id,n+1)
+        print 'port group interface %s mode enhanced' % (interface)
+
+    for p in ports:
+        print 'interface ' + p
+        print 'undo shutdown'
+    print 'quit'
+    print 'irf-port-configuration active'
+    print 'save'
+    separator()
+    note('Member %s is done' % current_member_id)
+
+note('plug in all IRF cables all members')
+note('members should reboot when plugging in the cables')
+separator()
 raw_input('hit any key when done:')
