@@ -1,0 +1,2 @@
+IMC REST API is accessible via 
+http://[imc-web-address]/imcrs/
