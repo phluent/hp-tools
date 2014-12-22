@@ -10,8 +10,8 @@ class default:
 PortTypeName=''
 numIRFMembers = []
 irfMembers = []
-print 'This program will create the IRF configuration for two to eight switchs'
-print 'All the inputs have defaults in square brakets but will be overwitten by users input'
+print 'This program will create the IRF configuration for two to eight switches'
+print 'All the inputs have defaults in square brackets but will be overwitten by users input'
 print 'Number of interfaces per members is set to 2, if you want more edit the code variable numIRFMembers'
 print 'The output is broken into sections, each section goes to individual switches'
 try:
