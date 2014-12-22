@@ -1,27 +1,25 @@
 ## This is a Comware IRF stack configuration builder
 # written by Ray Glauner and modifed by Mike Skelly
-
-# This is Ten gig interfaces using four ports on each module.
+# in this version only two ports per swtich are used
+# Defaults can be used through out.
 # Change the information in the IRF class to change the port names/numbers.
 class default:
     IrfPreamble = 'irf mac-address persistent timer', 'irf auto-update enable' ,'undo irf link-delay'
-    IrfMemPri = '50','40','30','25','20','15','10','5'
+    IrfMemPri = '30','26','22','16','12','10','8','6'
     PortTypeName = 'Ten-GigabitEthernet'
 PortTypeName=''
 numIRFMembers = []
 irfMembers = []
-
-try: 
+print 'This program will create the IRF configuration for two to eight switchs'
+print 'All the inputs have defaults in square brakets but will be overwitten by users input'
+print 'Number of interfaces per members is set to 2, if you want more edit the code variable numIRFMembers'
+print 'The output is broken into sections, each section goes to individual switches'
+try:
     numIRFMembers = input("Enter the number of IRF Members <2-8> [2]: ")
 except SyntaxError:
     numIRFMembers = 2
 
 numIRFPorts = 2 # Not sure that it makes sense to have more than two IRF ports, all somple configurations stop there
-#try:
-#    numIRFPorts = input("Enter the number of Interfaces to configure for irf <1-2> [2]: ")
-#except SyntaxError:
-#    numIRFPorts = 2
-
 PortTypeName = raw_input('Enter the Interface name <Ten-GigabitEthernet> [Ten-GigabitEthernet]: ')
 if PortTypeName =='':
     PortTypeName = default.PortTypeName
@@ -29,7 +27,7 @@ if PortTypeName =='':
 for i in range(numIRFMembers):
     memberPorts = []
     for n in range(numIRFPorts):
-        tmpPort = raw_input('interface port for IRF member {member} port {port} <{member}/0/{port}>: '.format(member=i+1,port=n+1))
+        tmpPort = raw_input('interface port for IRF member {member} port {port} <1/0/1> [{member}/0/{port}]: '.format(member=i+1,port=n+1))
         if tmpPort == '':
             tmpPort = str(i+1) + '/0/' + str(n+1)
         memberPorts.append(PortTypeName+tmpPort)
@@ -73,7 +71,7 @@ for i,ports in list(enumerate(irfMembers)):
         print 'interface ' + p
         print 'shutdown'
     print 'quit'
-    
+
     for line in default.IrfPreamble:
         print line
 
@@ -95,4 +93,4 @@ for i,ports in list(enumerate(irfMembers)):
 note('plug in all IRF cables all members')
 note('members should reboot when plugging in the cables')
 separator()
-raw_input('hit any key when done:')
+raw_input('Cut output before you hit OK:')
